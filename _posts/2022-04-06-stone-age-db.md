@@ -281,7 +281,7 @@ class Square extends Shape
 {
     public function countSides()
     {
-        return 3;
+        return 4;
     }
 }
 
