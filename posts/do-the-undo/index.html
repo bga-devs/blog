@@ -1,0 +1,493 @@
+<!DOCTYPE html><html lang="en" ><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><meta name="day-prompt" content="days ago"><meta name="hour-prompt" content="hours ago"><meta name="minute-prompt" content="minutes ago"><meta name="justnow-prompt" content="just now"><meta name="generator" content="Jekyll v4.2.1" /><meta property="og:title" content="Do the undo — The search for an undo system" /><meta name="author" content="Guillaume Benny" /><meta property="og:locale" content="en" /><meta name="description" content="Let’s talk about undoing." /><meta property="og:description" content="Let’s talk about undoing." /><link rel="canonical" href="https://bga-devs.github.io/blog/blog/posts/do-the-undo/" /><meta property="og:url" content="https://bga-devs.github.io/blog/blog/posts/do-the-undo/" /><meta property="og:site_name" content="BGA Developers" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2022-04-27T14:00:00+02:00" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="Do the undo — The search for an undo system" /><meta name="google-site-verification" content="google_meta_tag_verification" /> <script type="application/ld+json"> {"author":{"@type":"Person","name":"Guillaume Benny"},"description":"Let’s talk about undoing.","url":"https://bga-devs.github.io/blog/blog/posts/do-the-undo/","@type":"BlogPosting","headline":"Do the undo — The search for an undo system","dateModified":"2022-04-27T14:00:00+02:00","datePublished":"2022-04-27T14:00:00+02:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://bga-devs.github.io/blog/blog/posts/do-the-undo/"},"@context":"https://schema.org"}</script><title>Do the undo &mdash; The search for an undo system | BGA Developers</title><link rel="apple-touch-icon" sizes="180x180" href="/blog/assets/img/favicons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/blog/assets/img/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/blog/assets/img/favicons/favicon-16x16.png"><link rel="manifest" href="/blog/assets/img/favicons/site.webmanifest"><link rel="shortcut icon" href="/blog/assets/img/favicons/favicon.ico"><meta name="apple-mobile-web-app-title" content="BGA Developers"><meta name="application-name" content="BGA Developers"><meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/blog/assets/img/favicons/browserconfig.xml"><meta name="theme-color" content="#ffffff"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://fonts.gstatic.com"><link rel="preconnect" href="https://www.google-analytics.com" crossorigin="use-credentials"><link rel="dns-prefetch" href="https://www.google-analytics.com"><link rel="preconnect" href="https://www.googletagmanager.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://www.googletagmanager.com"><link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.11.2/css/all.min.css"><link rel="stylesheet" href="/blog/assets/css/style.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/magnific-popup@1.1.0/dist/magnific-popup.min.css"> <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script><body data-spy="scroll" data-target="#toc"><div id="sidebar" class="d-flex flex-column align-items-end" lang="en"><div class="profile-wrapper text-center"><div id="avatar"> <a href="/blog/" alt="avatar" class="mx-auto"> <img src="/blog/assets/img/avatar.jpg" alt="avatar" onerror="this.style.display='none'"> </a></div><div class="site-title mt-3"> <a href="/blog/">BGA Developers</a></div><div class="site-subtitle font-italic">The tales of BGA game development</div></div><ul class="w-100"><li class="nav-item"> <a href="/blog/" class="nav-link"> <i class="fa-fw fas fa-home ml-xl-3 mr-xl-3 unloaded"></i> <span>HOME</span> </a><li class="nav-item"> <a href="/blog/categories/" class="nav-link"> <i class="fa-fw fas fa-stream ml-xl-3 mr-xl-3 unloaded"></i> <span>CATEGORIES</span> </a><li class="nav-item"> <a href="/blog/tags/" class="nav-link"> <i class="fa-fw fas fa-tag ml-xl-3 mr-xl-3 unloaded"></i> <span>TAGS</span> </a><li class="nav-item"> <a href="/blog/archives/" class="nav-link"> <i class="fa-fw fas fa-archive ml-xl-3 mr-xl-3 unloaded"></i> <span>ARCHIVES</span> </a><li class="nav-item"> <a href="/blog/about/" class="nav-link"> <i class="fa-fw fas fa-info-circle ml-xl-3 mr-xl-3 unloaded"></i> <span>ABOUT</span> </a></ul><div class="sidebar-bottom mt-auto d-flex flex-wrap justify-content-center align-items-center"> <a href="https://github.com/bga-devs" aria-label="github" class="order-3" target="_blank" rel="noopener"> <i class="fab fa-github"></i> </a> <a href="https://twitter.com/" aria-label="twitter" class="order-4" target="_blank" rel="noopener"> <i class="fab fa-twitter"></i> </a> <a href=" javascript:location.href = 'mailto:' + ['tim.pecatte','gmail.com'].join('@')" aria-label="email" class="order-5" > <i class="fas fa-envelope"></i> </a> <a href="/blog/feed.xml" aria-label="rss" class="order-6" > <i class="fas fa-rss"></i> </a> <span class="icon-border order-2"></span> <span id="mode-toggle-wrapper" class="order-1"> <i class="mode-toggle fas fa-adjust"></i> <script type="text/javascript"> class ModeToggle { static get MODE_KEY() { return "mode"; } static get DARK_MODE() { return "dark"; } static get LIGHT_MODE() { return "light"; } constructor() { if (this.hasMode) { if (this.isDarkMode) { if (!this.isSysDarkPrefer) { this.setDark(); } } else { if (this.isSysDarkPrefer) { this.setLight(); } } } var self = this; /* always follow the system prefers */ this.sysDarkPrefers.addListener(function() { if (self.hasMode) { if (self.isDarkMode) { if (!self.isSysDarkPrefer) { self.setDark(); } } else { if (self.isSysDarkPrefer) { self.setLight(); } } self.clearMode(); } self.updateMermaid(); }); } /* constructor() */ setDark() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); } setLight() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); } clearMode() { $('html').removeAttr(ModeToggle.MODE_KEY); sessionStorage.removeItem(ModeToggle.MODE_KEY); } get sysDarkPrefers() { return window.matchMedia("(prefers-color-scheme: dark)"); } get isSysDarkPrefer() { return this.sysDarkPrefers.matches; } get isDarkMode() { return this.mode == ModeToggle.DARK_MODE; } get isLightMode() { return this.mode == ModeToggle.LIGHT_MODE; } get hasMode() { return this.mode != null; } get mode() { return sessionStorage.getItem(ModeToggle.MODE_KEY); } /* get the current mode on screen */ get modeStatus() { if (this.isDarkMode || (!this.hasMode && this.isSysDarkPrefer) ) { return ModeToggle.DARK_MODE; } else { return ModeToggle.LIGHT_MODE; } } updateMermaid() { if (typeof mermaid !== "undefined") { let expectedTheme = (this.modeStatus === ModeToggle.DARK_MODE? "dark" : "default"); let config = { theme: expectedTheme }; /* re-render the SVG › <https://github.com/mermaid-js/mermaid/issues/311#issuecomment-332557344> */ $(".mermaid").each(function() { let svgCode = $(this).prev().children().html(); $(this).removeAttr("data-processed"); $(this).html(svgCode); }); mermaid.initialize(config); mermaid.init(undefined, ".mermaid"); } } flipMode() { if (this.hasMode) { if (this.isSysDarkPrefer) { if (this.isLightMode) { this.clearMode(); } else { this.setLight(); } } else { if (this.isDarkMode) { this.clearMode(); } else { this.setDark(); } } } else { if (this.isSysDarkPrefer) { this.setLight(); } else { this.setDark(); } } this.updateMermaid(); } /* flipMode() */ } /* ModeToggle */ let toggle = new ModeToggle(); $(".mode-toggle").click(function() { toggle.flipMode(); }); </script> </span></div></div><div id="topbar-wrapper" class="row justify-content-center topbar-down"><div id="topbar" class="col-11 d-flex h-100 align-items-center justify-content-between"> <span id="breadcrumb"> <span> <a href="/blog/"> Home </a> </span> <span>Do the undo &mdash; The search for an undo system</span> </span> <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i><div id="topbar-title"> Post</div><i id="search-trigger" class="fas fa-search fa-fw"></i> <span id="search-wrapper" class="align-items-center"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off" placeholder="Search..."> <i class="fa fa-times-circle fa-fw" id="search-cleaner"></i> </span> <span id="search-cancel" >Cancel</span></div></div><div id="main-wrapper"><div id="main"><div class="row"><div id="post-wrapper" class="col-12 col-lg-11 col-xl-8"><div class="post pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><h1 data-toc-skip>Do the undo &mdash; The search for an undo system</h1><div class="post-meta text-muted d-flex flex-column"><div> <span class="semi-bold"> Guillaume Benny </span> on <span class="timeago " data-toggle="tooltip" data-placement="bottom" title="Wed, Apr 27, 2022, 2:00 PM +0200" >Apr 27<i class="unloaded">2022-04-27T14:00:00+02:00</i> </span></div><div> <span class="readtime" data-toggle="tooltip" data-placement="bottom" title="2898 words">16 min read</span></div></div><div class="post-content"><p>Let’s talk about undoing.</p><p>BGA has an <a href="https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Undo_moves">undo system</a> but it has limitations:</p><ul><li>You only have one undo. If you have a multi-step action, undoing means restarting from the beginning.<li>The undo system saves the whole database and restores everything. So it’s impossible to use when multiple players can do something to the database, whether in a <em>multipleactiveplayer</em> state — or if your inactive players can set an option specific to the table — or anything else that touches the database.</ul><p>This means that you often have to roll your own undo system. One solution is what I did for <a href="https://boardgamearena.com/gamepanel?game=theisleofcats">The Isle of Cats</a>: you do your multi-step actions on the client side. This is totally doable with your own system or with <a href="https://en.doc.boardgamearena.com/BGA_Studio_Cookbook#Multi_Step_Interactions:_Select_Worker/Place_Worker_-_Using_Client_States"><code class="language-plaintext highlighter-rouge">setClientState</code></a>. And <code class="language-plaintext highlighter-rouge">setClientState</code> is often the simplest — and best — choice. But this can lead to code duplication between the client side and the server side since you must do more on the client side (like validations).</p><p>So after creating a <a href="/blog/posts/stone-age-db/">database layer</a>, I set out to create a reusable, server-side undo system.</p><p><img data-proofer-ignore data-src="/blog/assets/img/do-the-undo/ok.gif" alt="OK" width="400" /></p><h2 id="a-simple-start">A simple start</h2><p>Let’s start with a simple game with only one database table, <code class="language-plaintext highlighter-rouge">shape</code>, with 3 columns:</p><ul><li><code class="language-plaintext highlighter-rouge">shape_id</code> is a unique id for the shape.<li><code class="language-plaintext highlighter-rouge">shape_type_id</code> is a number. 0 is a triangle, 1 is a square and 2 is an hexagon.<li><code class="language-plaintext highlighter-rouge">player_id</code> is the player that owns the shape. It’s <code class="language-plaintext highlighter-rouge">NULL</code> if the shape is in the general supply.</ul><p>Let’s say that on your turn, you can do something to take the shape. So you need to change <code class="language-plaintext highlighter-rouge">player_id</code> from <code class="language-plaintext highlighter-rouge">NULL</code> to <code class="language-plaintext highlighter-rouge">1234</code>. To be able to undo that, you could add a new <code class="language-plaintext highlighter-rouge">boolean</code> column that is <code class="language-plaintext highlighter-rouge">TRUE</code> when the row has been modified. This works, but if it’s possible to take more than one shape, you won’t know the order in which the actions where done. So you change this new column to an integer to keep the order. This works until you can take the shape of another player: you must then remember the previous <code class="language-plaintext highlighter-rouge">player_id</code>. This really doesn’t scale: soon you’ll be taking a copy of the whole database and we’re back to the BGA undo system.</p><h2 id="something-different">Something different</h2><p>We really need a different system. Let’s start at the very beginning: something that can <em>do</em>. We’ll assume that we have a <a href="/blog/posts/stone-age-db/">database layer</a> that return classes for our table:</p><div class="language-php highlighter-rouge"><div class="code-header"> <span text-data=" PHP "><i class="fa-fw fas fa-code small"></i></span> <button aria-label="copy" title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+</pre><td class="rouge-code"><pre><span class="c1">// Free function</span>
+<span class="k">function</span> <span class="n">getShapeById</span><span class="p">(</span><span class="nv">$shapeId</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$shape</span> <span class="o">=</span> <span class="c1">// Get Shape class instance from database layer</span>
+    <span class="k">return</span> <span class="nv">$shape</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">class</span> <span class="nc">PlayerTakeShapeActionCommand</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$playerId</span><span class="p">;</span>
+    <span class="k">private</span> <span class="nv">$shapeId</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">__construct</span><span class="p">(</span><span class="nv">$playerId</span><span class="p">,</span> <span class="nv">$shapeId</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// You know the drill</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">do</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$shape</span> <span class="o">=</span> <span class="nf">getShapeById</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">shapeId</span><span class="p">);</span>
+        <span class="nv">$shape</span><span class="o">-&gt;</span><span class="n">playerId</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">playerId</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// And somewhere in mygame.game.php (so in "class mygame extends Table"):</span>
+<span class="k">public</span> <span class="k">function</span> <span class="n">playerTakeShape</span><span class="p">(</span><span class="nv">$shapeId</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// Not shown: other validations...</span>
+    <span class="nv">$action</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">PlayerTakeShapeActionCommand</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">getActivePlayerId</span><span class="p">(),</span> <span class="nv">$shapeId</span><span class="p">);</span>
+    <span class="nv">$action</span><span class="o">-&gt;</span><span class="k">do</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">protected</span> <span class="k">function</span> <span class="n">getAllDatas</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$result</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="nv">$result</span><span class="p">[</span><span class="s1">'shapes'</span><span class="p">]</span> <span class="o">=</span> <span class="nf">getAllShapes</span><span class="p">();</span> <span class="c1">// getAllShapes() is left to your imagination</span>
+    <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>When a player clicks on a shape and <code class="language-plaintext highlighter-rouge">playerTakeShape()</code> is called, this does… nothing.</p><ul><li>No notifications are sent, so the client doesn’t know something happened.<li>Nothing is saved to the database so the change does not persist.</ul><p>This is great! <em>Great?</em> Yes! You’ll see later why we need something that does nothing. But for now, we need it to do a bit more: we need the modification to the shape to persist <em>in memory</em>:</p><div class="language-php highlighter-rouge"><div class="code-header"> <span text-data=" PHP "><i class="fa-fw fas fa-code small"></i></span> <button aria-label="copy" title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+</pre><td class="rouge-code"><pre><span class="c1">// Global</span>
+<span class="nv">$modifiedShapes</span> <span class="o">=</span> <span class="p">[];</span>
+
+<span class="c1">// Free function</span>
+<span class="k">function</span> <span class="n">markShapeModified</span><span class="p">(</span><span class="nv">$shape</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">global</span> <span class="nv">$modifiedShapes</span><span class="p">;</span>
+    <span class="c1">// $shape references a class (so it's _not_ a copy)</span>
+    <span class="nv">$modifiedShapes</span><span class="p">[</span><span class="nv">$shape</span><span class="o">-&gt;</span><span class="n">shapeId</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$shape</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// Free function</span>
+<span class="k">function</span> <span class="n">getShapeById</span><span class="p">(</span><span class="nv">$shapeId</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">global</span> <span class="nv">$modifiedShapes</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">array_key_exists</span><span class="p">(</span><span class="nv">$shape</span><span class="o">-&gt;</span><span class="n">shapeId</span><span class="p">,</span> <span class="nv">$modifiedShapes</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$modifiedShapes</span><span class="p">[</span><span class="nv">$shape</span><span class="o">-&gt;</span><span class="n">shapeId</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="nv">$shape</span> <span class="o">=</span> <span class="c1">// Get Shape class instance from database layer</span>
+    <span class="k">return</span> <span class="nv">$shape</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">class</span> <span class="nc">PlayerTakeShapeActionCommand</span>
+<span class="p">{</span>
+    <span class="c1">// ...</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">do</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$shape</span> <span class="o">=</span> <span class="nf">getShapeById</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">shapeId</span><span class="p">);</span>
+        <span class="nf">markShapeModified</span><span class="p">(</span><span class="nv">$shape</span><span class="p">);</span>
+        <span class="nv">$shape</span><span class="o">-&gt;</span><span class="n">playerId</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">playerId</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>This still does nothing: after the request to the server, what is only in memory is lost! But if we could save the instance of <code class="language-plaintext highlighter-rouge">PlayerTakeShapeActionCommand</code> to the database and reload it, we could call its <code class="language-plaintext highlighter-rouge">do()</code> function. And after the <code class="language-plaintext highlighter-rouge">do()</code>, <code class="language-plaintext highlighter-rouge">getShapeById()</code> would always return the modified shape.</p><h2 id="a-detour-into-serialize-land">A detour into serialize-land</h2><p><img data-proofer-ignore data-src="/blog/assets/img/do-the-undo/detour.jpg" alt="Detour" width="400" /></p><p>With PHP’s <a href="https://www.php.net/manual/en/book.reflection.php">ReflectionClass</a>, it’s actually easy to tranform (almost) any class to a string and back:</p><ul><li><code class="language-plaintext highlighter-rouge">ReflectionClass</code> allows us to loop on all properties and get their names and values, even if they are private.<li>If a value is an array or an object, we need to do a recursive call to process everything.<li>If its an object, we need to remember the class name to recreate it.</ul><div class="language-php highlighter-rouge"><div class="code-header"> <span text-data=" PHP "><i class="fa-fw fas fa-code small"></i></span> <button aria-label="copy" title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+</pre><td class="rouge-code"><pre><span class="c1">// Free function</span>
+<span class="k">function</span> <span class="n">extractAllPropertyValues</span><span class="p">(</span><span class="nv">$object</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">is_array</span><span class="p">(</span><span class="nv">$object</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">array_map</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$o</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nf">extractAllPropertyValues</span><span class="p">(</span><span class="nv">$o</span><span class="p">);</span>
+        <span class="p">},</span> <span class="nv">$object</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">is_object</span><span class="p">(</span><span class="nv">$object</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$object</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nv">$allProperties</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="c1">// The name @classId is arbitrary. It's prefixed with</span>
+        <span class="c1">// an @ to avoid collisions with real properties</span>
+        <span class="s1">'@classId'</span> <span class="o">=&gt;</span> <span class="nb">get_class</span><span class="p">(</span><span class="nv">$object</span><span class="p">),</span>
+    <span class="p">];</span>
+
+    <span class="nv">$reflect</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ReflectionClass</span><span class="p">(</span><span class="nb">get_class</span><span class="p">(</span><span class="nv">$object</span><span class="p">));</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$reflect</span><span class="o">-&gt;</span><span class="nf">getProperties</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$property</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$property</span><span class="o">-&gt;</span><span class="nf">setAccessible</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span> <span class="c1">// Bypass private or protected</span>
+        <span class="nv">$value</span> <span class="o">=</span> <span class="nv">$property</span><span class="o">-&gt;</span><span class="nf">getValue</span><span class="p">(</span><span class="nv">$object</span><span class="p">);</span>
+        <span class="nv">$allProperties</span><span class="p">[</span><span class="nv">$property</span><span class="o">-&gt;</span><span class="nf">getName</span><span class="p">()]</span> <span class="o">=</span> <span class="nf">extractAllPropertyValues</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nv">$allProperties</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>This function actually gives us an associative array than can be converted to a string with <code class="language-plaintext highlighter-rouge">json_encode()</code>. To recreate the object, we do the samething in reverse. We also need to use <code class="language-plaintext highlighter-rouge">ReflectionClass::newInstanceWithoutConstructor</code> to avoid the class constructor (for which we don’t know the parameters):</p><div class="language-php highlighter-rouge"><div class="code-header"> <span text-data=" PHP "><i class="fa-fw fas fa-code small"></i></span> <button aria-label="copy" title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+</pre><td class="rouge-code"><pre><span class="c1">// Free function</span>
+<span class="k">function</span> <span class="n">rebuildAllPropertyValues</span><span class="p">(</span><span class="nv">$values</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">is_array</span><span class="p">(</span><span class="nv">$values</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$values</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">array_key_exists</span><span class="p">(</span><span class="s1">'@classId'</span><span class="p">,</span> <span class="nv">$values</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nv">$reflect</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ReflectionClass</span><span class="p">(</span><span class="nv">$values</span><span class="p">[</span><span class="s1">'@classId'</span><span class="p">]);</span>
+        <span class="nv">$object</span> <span class="o">=</span> <span class="nv">$reflect</span><span class="o">-&gt;</span><span class="nf">newInstanceWithoutConstructor</span><span class="p">();</span> <span class="c1">// Like 'new' but does not call the constructor</span>
+        <span class="nb">unset</span><span class="p">(</span><span class="nv">$values</span><span class="p">[</span><span class="s1">'@classId'</span><span class="p">]);</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$values</span> <span class="k">as</span> <span class="nv">$propertyName</span> <span class="o">=&gt;</span> <span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$value</span> <span class="o">=</span> <span class="nf">rebuildAllPropertyValues</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+            <span class="nv">$property</span> <span class="o">=</span> <span class="nv">$reflect</span><span class="o">-&gt;</span><span class="nf">getProperty</span><span class="p">(</span><span class="nv">$propertyName</span><span class="p">);</span>
+            <span class="nv">$property</span><span class="o">-&gt;</span><span class="nf">setAccessible</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span> <span class="c1">// Bypass private or protected</span>
+            <span class="nv">$property</span><span class="o">-&gt;</span><span class="nf">setValue</span><span class="p">(</span><span class="nv">$object</span><span class="p">,</span> <span class="nv">$value</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$object</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">array_map</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nf">rebuildAllPropertyValues</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+        <span class="p">},</span> <span class="nv">$values</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>Again, this requires a call to <code class="language-plaintext highlighter-rouge">json_decode($string, true)</code> to convert a string to an associative array that can be passed to <code class="language-plaintext highlighter-rouge">rebuildAllPropertyValues()</code>.</p><h2 id="back-to-doing">Back to doing</h2><p>Now that we can tranform our class into a string, we only need a table — let’s call it <code class="language-plaintext highlighter-rouge">action_command</code> — with two columns:</p><ul><li>An autoincrement id, which is the order the actions are inserted<li>A big enough varchar column to store the serialized class.</ul><p>Our game functions now looks like this:</p><div class="language-php highlighter-rouge"><div class="code-header"> <span text-data=" PHP "><i class="fa-fw fas fa-code small"></i></span> <button aria-label="copy" title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+</pre><td class="rouge-code"><pre><span class="c1">// Free function</span>
+<span class="k">public</span> <span class="k">function</span> <span class="n">saveActionToDatabase</span><span class="p">(</span><span class="nv">$action</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$string</span> <span class="o">=</span> <span class="nb">json_encode</span><span class="p">(</span><span class="nf">extractAllPropertyValues</span><span class="p">(</span><span class="nv">$action</span><span class="p">));</span>
+    <span class="c1">// Save $string in action_command table</span>
+<span class="p">}</span>
+
+<span class="c1">// Free function</span>
+<span class="k">public</span> <span class="k">function</span> <span class="n">reloadActionsFromDatabase</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="cm">/*get rows from action_command table*/</span> <span class="k">as</span> <span class="nv">$row</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$action</span> <span class="o">=</span> <span class="nf">rebuildAllPropertyValues</span><span class="p">(</span><span class="nb">json_decode</span><span class="p">(</span><span class="nv">$row</span><span class="o">-&gt;</span><span class="n">string_column</span><span class="p">,</span> <span class="kc">true</span><span class="p">));</span>
+        <span class="c1">// Don't forget, calling "do()" will fill $modifiedShapes</span>
+        <span class="nv">$action</span><span class="o">-&gt;</span><span class="k">do</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Somewhere in mygame.game.php (so in "class mygame extends Table"):</span>
+<span class="k">public</span> <span class="k">function</span> <span class="n">playerTakeShape</span><span class="p">(</span><span class="nv">$shapeId</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nf">reloadActionsFromDatabase</span><span class="p">();</span>
+    <span class="c1">// Not shown: other validations...</span>
+    <span class="nv">$action</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">PlayerTakeShapeActionCommand</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">getActivePlayerId</span><span class="p">(),</span> <span class="nv">$shapeId</span><span class="p">);</span>
+    <span class="nv">$action</span><span class="o">-&gt;</span><span class="k">do</span><span class="p">();</span>
+    <span class="nf">saveActionToDatabase</span><span class="p">(</span><span class="nv">$action</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">protected</span> <span class="k">function</span> <span class="n">getAllDatas</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nf">reloadActionsFromDatabase</span><span class="p">();</span>
+    <span class="nv">$result</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="c1">// NOTE: getAllShapes() must look in $modifiedShapes for this to work</span>
+    <span class="nv">$result</span><span class="p">[</span><span class="s1">'shapes'</span><span class="p">]</span> <span class="o">=</span> <span class="nf">getAllShapes</span><span class="p">();</span> <span class="c1">// getAllShapes() is left to your imagination, as long as you imagine the right implementation :)</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>Suddenly, we can save actions and redo them each time we need it! … But we still need to reload to see the result. We need to integrate notifications into this. Let’s create a class to help us:</p><div class="language-php highlighter-rouge"><div class="code-header"> <span text-data=" PHP "><i class="fa-fw fas fa-code small"></i></span> <button aria-label="copy" title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">Notifier</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">notify</span><span class="p">(</span><span class="nv">$notifType</span><span class="p">,</span> <span class="nv">$notifLog</span><span class="p">,</span> <span class="nv">$notifArgs</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// Get a reference to the game class and call notifyAllPlayers</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>We can now notify our players:</p><div class="language-php highlighter-rouge"><div class="code-header"> <span text-data=" PHP "><i class="fa-fw fas fa-code small"></i></span> <button aria-label="copy" title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">PlayerTakeShapeActionCommand</span>
+<span class="p">{</span>
+    <span class="c1">// ...</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">do</span><span class="p">(</span><span class="nv">$notifier</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$shape</span> <span class="o">=</span> <span class="nf">getShapeById</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">shapeId</span><span class="p">);</span>
+        <span class="nf">markShapeModified</span><span class="p">(</span><span class="nv">$shape</span><span class="p">);</span>
+        <span class="nv">$shape</span><span class="o">-&gt;</span><span class="n">playerId</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">playerId</span><span class="p">;</span>
+        <span class="nv">$notifier</span><span class="o">-&gt;</span><span class="nf">notify</span><span class="p">(</span>
+            <span class="s1">'MOVE_SHAPE_TO_PLAYER'</span><span class="p">,</span>
+            <span class="s1">'Moving!'</span><span class="p">,</span>
+            <span class="p">[</span>
+                <span class="s1">'playerId'</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">playerId</span><span class="p">,</span>
+                <span class="s1">'shapeId'</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">shapeId</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>But there’s a problem: we want to send a notification only the first time we do the action, not when we reload it from the database. Another class to the rescue: just drop notifications when reloading.</p><div class="language-php highlighter-rouge"><div class="code-header"> <span text-data=" PHP "><i class="fa-fw fas fa-code small"></i></span> <button aria-label="copy" title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">ReloadNotifier</span>
+<span class="p">{</span>
+    <span class="c1">// Yes, a function that does nothing!</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">notify</span><span class="p">(</span><span class="nv">$notifType</span><span class="p">,</span> <span class="nv">$notifLog</span><span class="p">,</span> <span class="nv">$notifArgs</span><span class="p">)</span>
+    <span class="p">{</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Free function</span>
+<span class="k">public</span> <span class="k">function</span> <span class="n">reloadActionsFromDatabase</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$notifier</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ReloadNotifier</span><span class="p">();</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="cm">/*get rows from action_command table*/</span> <span class="k">as</span> <span class="nv">$row</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$action</span> <span class="o">=</span> <span class="nf">rebuildAllPropertyValues</span><span class="p">(</span><span class="nb">json_decode</span><span class="p">(</span><span class="nv">$row</span><span class="o">-&gt;</span><span class="n">string_column</span><span class="p">,</span> <span class="kc">true</span><span class="p">));</span>
+        <span class="nv">$action</span><span class="o">-&gt;</span><span class="k">do</span><span class="p">(</span><span class="nv">$notifier</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></table></code></div></div><h2 id="but-wheres-the-undo">But… where’s the undo?</h2><p><img data-proofer-ignore data-src="/blog/assets/img/do-the-undo/where.gif" alt="Where is the undo" width="260" /></p><p>Now that we know how to <em>do</em>, let’s <em>undo</em>.</p><p>Again, if we could convince everyone to just reload the whole page after each action, undoing would only requires deleting the last row in the <code class="language-plaintext highlighter-rouge">action_command</code> table. But we need those notifications. So in our <code class="language-plaintext highlighter-rouge">PlayerTakeShapeActionCommand</code> class, we must remember what is needed to undo the action and add a function to send the notification:</p><div class="language-php highlighter-rouge"><div class="code-header"> <span text-data=" PHP "><i class="fa-fw fas fa-code small"></i></span> <button aria-label="copy" title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">PlayerTakeShapeActionCommand</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$playerId</span><span class="p">;</span>
+    <span class="k">private</span> <span class="nv">$shapeId</span><span class="p">;</span>
+    <span class="c1">// NEW</span>
+    <span class="k">private</span> <span class="nv">$previousPlayerId</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">__construct</span><span class="p">(</span><span class="nv">$playerId</span><span class="p">,</span> <span class="nv">$shapeId</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// You know the drill: store $playerId and $shapeId in properties</span>
+        <span class="c1">// But leave $previousPlayerId null</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">do</span><span class="p">(</span><span class="nv">$notifier</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$shape</span> <span class="o">=</span> <span class="nf">getShapeById</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">shapeId</span><span class="p">);</span>
+        <span class="c1">// NEW</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">previousPlayerId</span> <span class="o">=</span> <span class="nv">$shape</span><span class="o">-&gt;</span><span class="n">playerId</span><span class="p">;</span>
+        <span class="nf">markShapeModified</span><span class="p">(</span><span class="nv">$shape</span><span class="p">);</span>
+        <span class="nv">$shape</span><span class="o">-&gt;</span><span class="n">playerId</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">playerId</span><span class="p">;</span>
+        <span class="nv">$notifier</span><span class="o">-&gt;</span><span class="nf">notify</span><span class="p">(</span>
+            <span class="s1">'MOVE_SHAPE_TO_PLAYER'</span><span class="p">,</span>
+            <span class="s1">'Moving!'</span><span class="p">,</span>
+            <span class="p">[</span>
+                <span class="s1">'playerId'</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">playerId</span><span class="p">,</span>
+                <span class="s1">'shapeId'</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">shapeId</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="c1">// NEW</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">undo</span><span class="p">(</span><span class="nv">$notifier</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$notifier</span><span class="o">-&gt;</span><span class="nf">notify</span><span class="p">(</span>
+            <span class="s1">'MOVE_SHAPE_TO_PLAYER'</span><span class="p">,</span>
+            <span class="s1">'Undoing!'</span><span class="p">,</span>
+            <span class="p">[</span>
+                <span class="s1">'playerId'</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">previousPlayerId</span><span class="p">,</span>
+                <span class="s1">'shapeId'</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">shapeId</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>And the implementation of undo is straightforward:</p><div class="language-php highlighter-rouge"><div class="code-header"> <span text-data=" PHP "><i class="fa-fw fas fa-code small"></i></span> <button aria-label="copy" title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre><td class="rouge-code"><pre><span class="c1">// Somewhere in mygame.game.php (so in "class mygame extends Table"):</span>
+<span class="k">public</span> <span class="k">function</span> <span class="n">undo</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Send an error if the action_command table is empty: no actions to undo!</span>
+    <span class="nv">$row</span> <span class="o">=</span> <span class="c1">// Get last row from from action_command table</span>
+    <span class="nv">$action</span> <span class="o">=</span> <span class="nf">rebuildAllPropertyValues</span><span class="p">(</span><span class="nb">json_decode</span><span class="p">(</span><span class="nv">$row</span><span class="o">-&gt;</span><span class="n">string_column</span><span class="p">,</span> <span class="kc">true</span><span class="p">));</span>
+    <span class="nv">$action</span><span class="o">-&gt;</span><span class="nf">undo</span><span class="p">(</span><span class="k">new</span> <span class="nc">Notifier</span><span class="p">());</span>
+    <span class="c1">// Delete $row from action_command table</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>When the player confirms their actions — or if they are about to do an action that cannot be undone — we need to:</p><ul><li>Load all rows from <code class="language-plaintext highlighter-rouge">action_command</code> table and call <code class="language-plaintext highlighter-rouge">do()</code>;<li>Save all modified shapes that are in <code class="language-plaintext highlighter-rouge">$modifiedShapes</code> array;<li>Delete all rows from the <code class="language-plaintext highlighter-rouge">action_command</code> table!</ul><p>That’s it, we’ve done it!</p><h2 id="a-nice-side-effect">A nice side effect</h2><p>Once you have such a system, something unexpected happens: you know the actions that the player did and you can get useful information out of this. This can replace some clunky globals that you need to keep to remember the state of the game.</p><p>Here’s a real example. In the game <a href="https://boardgamegeek.com/boardgame/219513/barenpark">Bärenpark</a>, a player turn is like this:</p><ol><li>You take a tile from your own supply.<li>You place the tile on your own board. In doing this, you cover some icons.<li>You take tiles from the general supply. The tiles you are allowed to take depends on the covered icons.</ol><p>Normally, to implement this, you need a table or some globals to remember:</p><ol><li>The tile that is choosen.<li>The icons that are covered.<li>Each time you take a tile from the general supply, you must match it with the covered icons and remove the icon from the list of icons that are still available.</ol><p>But with the information in the <code class="language-plaintext highlighter-rouge">action_command</code> table, you can get this information <em>for free</em>.</p><p>For example, when you choose a tile in step 1, you save the <code class="language-plaintext highlighter-rouge">ChooseTileActionCommand</code> class with a <code class="language-plaintext highlighter-rouge">$shapeId</code> property. When you are in the state for step 2, you can search the actions for this class and get the selected <code class="language-plaintext highlighter-rouge">$shapeId</code>.</p><p>The same kind of idea works also for step 2 and 3: in the <code class="language-plaintext highlighter-rouge">do()</code> function of step 2, you can save the covered icons in a member array of the class. Once in step 3, you can query those icons to get what tile is available.</p><p>The <code class="language-plaintext highlighter-rouge">do()</code> function of the <code class="language-plaintext highlighter-rouge">ActionCommand</code> classes is also a great place to validate the parameters: is the selected <code class="language-plaintext highlighter-rouge">shapeId</code> really a valid shape? If not, just throw an exception to get out of there!</p><h2 id="more-things-to-think-about">More things to think about</h2><p>At this point, you might be convinced that this is a good idea. And I am! But if you are about to go with such a system, you still have other important things to think about because a lot of things where left out:</p><ul><li><strong>State and transitions</strong>: At some point, you will need an <code class="language-plaintext highlighter-rouge">ActionCommand</code> class to <em>do</em> and <em>undo</em> state transitions.<ul><li>This is a good idea but you need to do the transition only in the first <code class="language-plaintext highlighter-rouge">do()</code>, just like with notifications. So the <code class="language-plaintext highlighter-rouge">Notifier</code> class is a good place to encapsulate the code that really calls <code class="language-plaintext highlighter-rouge">$this-&gt;gamestate-&gt;nextState()</code>.<li>When undoing, you either need to have a valid transition to the previous state, or you need to use the undocumented <code class="language-plaintext highlighter-rouge">$this-&gt;gamestate-&gt;jumpToState($stateId)</code> call to got back to the previous state.</ul><li><strong>Grouping ActionCommand</strong>: You can split your <code class="language-plaintext highlighter-rouge">ActionCommand</code> in smaller, reusable classes which is great. But if you use more that one <code class="language-plaintext highlighter-rouge">ActionCommand</code> in one player action, you will undo only part of the action if your undo only deletes the last row of the <code class="language-plaintext highlighter-rouge">action_command</code> table. So create a <code class="language-plaintext highlighter-rouge">GroupActionCommand</code> class: you add your <code class="language-plaintext highlighter-rouge">ActionCommand</code> instances to it and save only the <code class="language-plaintext highlighter-rouge">GroupActionCommand</code>. The <code class="language-plaintext highlighter-rouge">do()</code> of this class only needs to loop on the added classes and call their <code class="language-plaintext highlighter-rouge">do()</code> functions. The undo is the samething, but you call <code class="language-plaintext highlighter-rouge">undo()</code> in reverse order.<li><strong>Upgrading ActionCommand</strong>: Once the game is released, you might need to change an <code class="language-plaintext highlighter-rouge">ActionCommand</code> class but you will not be able to use BGA’s <code class="language-plaintext highlighter-rouge">upgradeTableDb()</code> function. There are a few options:<ul><li>You can create a new class. You leave the <code class="language-plaintext highlighter-rouge">ChooseTileActionCommand</code> class like it is and you create and start using <code class="language-plaintext highlighter-rouge">ChooseTileActionCommandVersion2</code> class instead. Old games will be able to undo the first class and when they choose a new tile, the new class will be created and saved.<li>You add a new property in your existing class and initialize it in the constructor. When the class is created in your new code, it will have that value. But if it’s read back from the <code class="language-plaintext highlighter-rouge">action_command</code> table from a game that started before the new version, the property will be <code class="language-plaintext highlighter-rouge">null</code> because it won’t be initialized by <code class="language-plaintext highlighter-rouge">rebuildAllPropertyValues()</code>. You can then react accordingly.</ul></ul><h2 id="a-real-implementation">A real implementation</h2><p>There’s a lot in this post but it’s a real system that works and the game <a href="https://boardgamearena.com/gamepanel?game=barenpark">Bärenpark</a> uses it (the game is in Alpha at the time of writing).</p><p>If you want to poke around and see the real implementation, see <a href="https://github.com/bennygui/barenpark-public/blob/main/modules/php/BX/Action.php">Action.php</a> from Bärenpark’s library. Here are a few things to know that will help you browse all this code:</p><ul><li><code class="language-plaintext highlighter-rouge">BaseActionRow</code> and <code class="language-plaintext highlighter-rouge">BaseActionRowMgr</code> are the base classes for rows that are read from database tables but that can also be modified in memory only. This replaces the ugly global <code class="language-plaintext highlighter-rouge">$modifiedShapes</code> and associated functions in the example above.<li><code class="language-plaintext highlighter-rouge">BaseActionCommand</code> is a base class for all <code class="language-plaintext highlighter-rouge">ActionCommand</code><li><code class="language-plaintext highlighter-rouge">ActionCommandRow</code> is a row in the <code class="language-plaintext highlighter-rouge">action_command</code> table.<li><code class="language-plaintext highlighter-rouge">BaseActionCommandNotifier</code> and all derived classes are the <code class="language-plaintext highlighter-rouge">Notifier</code> in the example above.<li><code class="language-plaintext highlighter-rouge">ActionCommandMgr</code> loads, saves and deletes rows from the <code class="language-plaintext highlighter-rouge">action_command</code> table. It also calls <code class="language-plaintext highlighter-rouge">do()</code> and <code class="language-plaintext highlighter-rouge">undo()</code>.</ul><p>You call also look at real <code class="language-plaintext highlighter-rouge">ActionCommand</code> classes from <a href="https://github.com/bennygui/barenpark-public/blob/main/modules/php/BP/Action.php">the game</a>, like <code class="language-plaintext highlighter-rouge">ChooseTileFromPlayerSupplyActionCommand</code>which is very simple.</p><p>Finally, you can check the function <a href="https://github.com/bennygui/barenpark-public/blob/main/modules/php/BP/States/ChooseTileFromPlayerSupply.php"><code class="language-plaintext highlighter-rouge">chooseTileFromPlayerSupply</code></a> which is called when the player clicks on a shape. The undo system allows the function to be very short and easy to read.</p><h2 id="more-features">More features</h2><p>One thing to note is that, in Bärenpark’s implementation, what a player does is private to that player until they confirm their turn. This is to allow the player to <em>try</em> some tile placements, like you can do in <a href="https://boardgamearena.com/gamepanel?game=patchwork">Patchwork</a> or <a href="https://boardgamearena.com/gamepanel?game=theisleofcats">The Isle of Cats</a>.</p><p>This also allows some weirder things like preparing your next move even if it’s not your turn! For this, the game tracks <em>private states</em>, meaning that all players are in the same state for BGA’s framework but the game also has another table to track states for each player. The idea of private states was taken from <a href="https://github.com/Syarwin/bga-welcometo">Welcome to</a> which uses it for a <em>multipleactiveplayer</em> state, but my implementation is pretty similar. <a href="https://en.doc.boardgamearena.com/Your_game_state_machine:_states.inc.php#Private_parallel_states">Private parallel states</a> based on Welcome’s implementation are now available in BGA’s framework, but they work only when multiple players are active.</p><p>Finally, allowing players to prepare their next turn means that there might be conflicts to resolve. If you are interessted in that, see <code class="language-plaintext highlighter-rouge">ActionCommandMgr::getReevaluationArgs()</code> and <code class="language-plaintext highlighter-rouge">ActionCommandMgr::reevaluate()</code>. I wouldn’t recommend doing something more complicated than undoing the conflicting actions, as trying to fix actions can become complicated very fast. But Bärenpark’s implementation does do a few tricks if you are eager to go down the rabbit hole.</p><h2 id="the-end">The End!</h2><p><img data-proofer-ignore data-src="/blog/assets/img/do-the-undo/thats-all.jpg" alt="That's all" width="400" /></p><p>That’s all for now! Until next time, have fun!</p></div><div class="post-tail-wrapper text-muted"><div class="post-meta mb-3"> <i class="far fa-folder-open fa-fw mr-1"></i> <a href='/blog/categories/tips/'>Tips</a></div><div class="post-tags"> <i class="fa fa-tags fa-fw mr-1"></i> <a href="/blog/tags/back/" class="post-tag no-text-decoration" >back</a> <a href="/blog/tags/class/" class="post-tag no-text-decoration" >class</a> <a href="/blog/tags/database/" class="post-tag no-text-decoration" >database</a></div><div class="post-tail-bottom d-flex justify-content-between align-items-center mt-3 pt-5 pb-2"><div class="license-wrapper"> This post is licensed under <a href="https://creativecommons.org/licenses/by/4.0/"> CC BY 4.0 </a> by the author.</div><div class="share-wrapper"> <span class="share-label text-muted mr-1">Share</span> <span class="share-icons"> <a href="https://twitter.com/intent/tweet?text=Do the undo &mdash; The search for an undo system - BGA Developers&url=https://bga-devs.github.io/blog/blog/posts/do-the-undo/" data-toggle="tooltip" data-placement="top" title="Twitter" target="_blank" rel="noopener" aria-label="Twitter"> <i class="fa-fw fab fa-twitter"></i> </a> <a href="https://www.facebook.com/sharer/sharer.php?title=Do the undo &mdash; The search for an undo system - BGA Developers&u=https://bga-devs.github.io/blog/blog/posts/do-the-undo/" data-toggle="tooltip" data-placement="top" title="Facebook" target="_blank" rel="noopener" aria-label="Facebook"> <i class="fa-fw fab fa-facebook-square"></i> </a> <a href="https://telegram.me/share?text=Do the undo &mdash; The search for an undo system - BGA Developers&url=https://bga-devs.github.io/blog/blog/posts/do-the-undo/" data-toggle="tooltip" data-placement="top" title="Telegram" target="_blank" rel="noopener" aria-label="Telegram"> <i class="fa-fw fab fa-telegram"></i> </a> <i id="copy-link" class="fa-fw fas fa-link small" data-toggle="tooltip" data-placement="top" title="Copy link" title-succeed="Link copied successfully!"> </i> </span></div></div></div></div></div><div id="panel-wrapper" class="col-xl-3 pl-2 text-muted topbar-down"><div class="access"><div id="access-lastmod" class="post"> <span>Recent Update</span><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="/blog/posts/stone-age-db/">Getting the database out of the stone age</a><li><a href="/blog/posts/why-use-typescript/">Why (I) use TypeScript</a><li><a href="/blog/posts/class-notif/">Classes, notifications and bugs!</a><li><a href="/blog/posts/a-real-fast-replay-mode/">How to make a real fast replay mode</a></ul></div><div id="access-tags"> <span>Trending Tags</span><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/blog/tags/back/">back</a> <a class="post-tag" href="/blog/tags/front/">front</a> <a class="post-tag" href="/blog/tags/class/">class</a> <a class="post-tag" href="/blog/tags/debug/">debug</a> <a class="post-tag" href="/blog/tags/database/">database</a> <a class="post-tag" href="/blog/tags/replay/">replay</a> <a class="post-tag" href="/blog/tags/css/">css</a> <a class="post-tag" href="/blog/tags/notification/">notification</a> <a class="post-tag" href="/blog/tags/translation/">translation</a> <a class="post-tag" href="/blog/tags/typescript/">typescript</a></div></div></div><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.js"></script><div id="toc-wrapper" class="pl-0 pr-4 mb-5"> <span class="pl-3 pt-2 mb-2">Contents</span><nav id="toc" data-toggle="toc"></nav></div></div></div><div class="row"><div class="col-12 col-lg-11 col-xl-8"><div id="post-extend-wrapper" class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><div id="related-posts" class="mt-5 mb-2 mb-sm-4"><h3 class="pt-2 mt-1 mb-4 ml-1" data-toc-skip>Further Reading</h3><div class="card-deck mb-4"><div class="card"> <a href="/blog/posts/stone-age-db/"><div class="card-body"> <span class="timeago small" >Apr 6<i class="unloaded">2022-04-06T14:00:00+02:00</i> </span><h3 class="pt-0 mt-1 mb-3" data-toc-skip>Getting the database out of the stone age</h3><div class="text-muted small"><p> See what I did there? Stone Age? OK, sorry about that. BGA’s database layer is… old. Writting database requests by hand is tedious and prone to errors. So after developing 2 games on BGA, I und...</p></div></div></a></div><div class="card"> <a href="/blog/posts/class-notif/"><div class="card-body"> <span class="timeago small" >Nov 25, 2021<i class="unloaded">2021-11-25T14:00:00+01:00</i> </span><h3 class="pt-0 mt-1 mb-3" data-toc-skip>Classes, notifications and bugs!</h3><div class="text-muted small"><p> When creating a game, you will probably want to create classes so that your code doesn’t become a mess. Something like this: class Card { public $cardId; public $locationId; public $pl...</p></div></div></a></div><div class="card"> <a href="/blog/posts/translations-summary/"><div class="card-body"> <span class="timeago small" >Nov 28, 2021<i class="unloaded">2021-11-28T11:00:00+01:00</i> </span><h3 class="pt-0 mt-1 mb-3" data-toc-skip>Translations - a recap</h3><div class="text-muted small"><p> As I usually say on the discord server for BGA developpers, translations are easy and hard. Hard because translations seems to be one of the most recurring issue developpers are facing on BGA, even...</p></div></div></a></div></div></div><div class="post-navigation d-flex justify-content-between"> <a href="/blog/posts/stuck-with-stock/" class="btn btn-outline-primary" prompt="Older"><p>Stuck with Stock?</p></a> <span class="btn btn-outline-primary disabled" prompt="Newer"><p>-</p></span></div><div id="disqus_thread" class="pt-2 pb-2"><p class="text-center text-muted small"> Comments powered by <a href="https://disqus.com/">Disqus</a>.</p></div><script type="text/javascript"> var disqus_config = function () { this.page.url = 'https://bga-devs.github.io/blog/blog/posts/do-the-undo/'; this.page.identifier = '/posts/do-the-undo/'; }; /* Lazy loading */ var disqus_observer = new IntersectionObserver(function (entries) { if(entries[0].isIntersecting) { (function () { var d = document, s = d.createElement('script'); s.src = 'https://bga-devs-blog.disqus.com/embed.js'; s.setAttribute('data-timestamp', +new Date()); (d.head || d.body).appendChild(s); })(); disqus_observer.disconnect(); } }, { threshold: [0] }); disqus_observer.observe(document.querySelector('#disqus_thread')); /* Auto switch theme */ function reloadDisqus() { /* Disqus hasn't been loaded */ if (typeof DISQUS === "undefined") { return; } if (document.readyState == 'complete') { DISQUS.reset({ reload: true, config: disqus_config }); } } const modeToggle = document.querySelector(".mode-toggle"); if (modeToggle !== null) { modeToggle.addEventListener('click', reloadDisqus); window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', reloadDisqus); } </script></div></div></div><footer class="d-flex w-100 justify-content-center"><div class="d-flex justify-content-between align-items-center"><div class="footer-left"><p class="mb-0"> © 2022 <a href="https://github.com/Syarwin">Timothée Pecatte</a>. <span data-toggle="tooltip" data-placement="top" title="Except where otherwise noted, the blog posts on this site are licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) License by the author.">Some rights reserved.</span></p></div><div class="footer-right"><p class="mb-0"> Powered by <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a> with <a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">Chirpy</a> theme.</p></div></div></footer></div><div id="search-result-wrapper" class="d-flex justify-content-center unloaded"><div class="col-12 col-sm-11 post-content"><div id="search-hints"><h4 class="text-muted mb-4">Trending Tags</h4><a class="post-tag" href="/blog/tags/back/">back</a> <a class="post-tag" href="/blog/tags/front/">front</a> <a class="post-tag" href="/blog/tags/class/">class</a> <a class="post-tag" href="/blog/tags/debug/">debug</a> <a class="post-tag" href="/blog/tags/database/">database</a> <a class="post-tag" href="/blog/tags/replay/">replay</a> <a class="post-tag" href="/blog/tags/css/">css</a> <a class="post-tag" href="/blog/tags/notification/">notification</a> <a class="post-tag" href="/blog/tags/translation/">translation</a> <a class="post-tag" href="/blog/tags/typescript/">typescript</a></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><div id="mask"></div><a id="back-to-top" href="#" aria-label="back-to-top" class="btn btn-lg btn-box-shadow" role="button"> <i class="fas fa-angle-up"></i> </a> <script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js"></script> <script> SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/blog/assets/js/data/search.json', searchResultTemplate: '<div class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-lg-4 pr-lg-4 pl-xl-0 pr-xl-0"> <a href="{url}">{title}</a><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"> {categories} {tags}</div><p>{snippet}</p></div>', noResultsText: '<p class="mt-5">Oops! No result founds.</p>', templateMiddleware: function(prop, value, template) { if (prop === 'categories') { if (value === '') { return `${value}`; } else { return `<div class="mr-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`; } } if (prop === 'tags') { if (value === '') { return `${value}`; } else { return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`; } } } }); </script> <script src="https://cdn.jsdelivr.net/combine/npm/lozad/dist/lozad.min.js,npm/magnific-popup@1/dist/jquery.magnific-popup.min.js,npm/clipboard@2/dist/clipboard.min.js"></script> <script defer src="/blog/assets/js/dist/post.min.js"></script> <script src="https://cdn.jsdelivr.net/combine/npm/popper.js@1.16.1,npm/bootstrap@4/dist/js/bootstrap.min.js"></script> <script defer src="/blog/app.js"></script> <script defer src="https://www.googletagmanager.com/gtag/js?id="></script> <script> document.addEventListener("DOMContentLoaded", function(event) { window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', ''); }); </script>

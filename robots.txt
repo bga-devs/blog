@@ -1,0 +1,5 @@
+User-agent: *
+
+Disallow: /norobots/
+
+Sitemap: https://bga-devs.github.io/blog/blog/sitemap.xml
